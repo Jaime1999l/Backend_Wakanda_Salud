@@ -21,7 +21,7 @@ class CitaUrgente {
 
 package Auth-Token {
 
-    class Usuario {
+    abstract class Usuario {
         - Long id
         - String nombre
         - String apellido
@@ -30,29 +30,25 @@ package Auth-Token {
         - List <String> roles // Rol esecifico para cada microservicio
     }
 
+    class Paciente extends Usuario {
+        - String numeroHistoriaClinica
+        - Date fechaNacimiento
+        - String direccion
+        - HistorialMedico historialMedico
+    }
+
+    class Medico extends Usuario {
+        - String especialidad
+        - String numeroLicencia
+        - AgendaMedica agenda
+    }
+
     class Credenciales {
         - Long id
         - String correo
         - String password
         - Usuario usuario
     }
-}
-
-class Paciente {
-    - Long id
-    - String numeroHistoriaClinica
-    - Date fechaNacimiento
-    - String direccion
-    - Usuario usuario
-    - HistorialMedico historialMedico
-}
-
-class Medico {
-    - Long id
-    - String especialidad
-    - String numeroLicencia
-    - Usuario usuario
-    - AgendaMedica agenda
 }
 
 class SistemaCitas {
@@ -113,8 +109,8 @@ class Notificacion {
 Cita <|-- CitaNormal
 Cita <|-- CitaUrgente
 
-Usuario "1" -- "1" Paciente
-Usuario "1" -- "1" Medico
+Usuario <|-- Paciente
+Usuario <|-- Medico
 Usuario "1" -- "1" Credenciales
 Paciente "1" -- "1" HistorialMedico
 HistorialMedico "1" -- "0..*" EntradaHistorial

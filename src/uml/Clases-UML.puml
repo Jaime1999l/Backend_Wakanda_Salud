@@ -1,0 +1,133 @@
+@startuml
+
+abstract class Cita {
+    - Long id
+    - Date fechaHora
+    - String estado // 'PENDIENTE', 'CONFIRMADA', 'CANCELADA', 'PROPUESTA', 'ACEPTADA', 'RECHAZADA'
+    - Paciente paciente
+    - Medico medico
+}
+
+class CitaNormal {
+    - String motivo
+    - Boolean creadaPorMedico // Indica si fue generada por el médico
+}
+
+class CitaUrgente {
+    - String motivoUrgencia
+    - String nivelPrioridad // 'ALTA', 'MEDIA', 'BAJA'
+}
+
+
+package Auth-Token {
+
+    class Usuario {
+        - Long id
+        - String nombre
+        - String apellido
+        - String email
+        - Credenciales credenciales
+        - List <String> roles // Rol esecifico para cada microservicio
+    }
+
+    class Credenciales {
+        - Long id
+        - String correo
+        - String password
+        - Usuario usuario
+    }
+}
+
+class Paciente {
+    - Long id
+    - String numeroHistoriaClinica
+    - Date fechaNacimiento
+    - String direccion
+    - Usuario usuario
+    - HistorialMedico historialMedico
+}
+
+class Medico {
+    - Long id
+    - String especialidad
+    - String numeroLicencia
+    - Usuario usuario
+    - AgendaMedica agenda
+}
+
+class SistemaCitas {
+    - Long id
+    - List<Cita> citas
+    - CentroSalud centroSalud
+    - String descripcion
+}
+
+class CentroSalud {
+    - Long id
+    - String nombre
+    - String direccion
+    - String telefono
+    - List<Medico> medicos
+    - List<Paciente> pacientes
+    - List<SistemaCitas> sistemasCitas
+}
+
+class AgendaMedica {
+    - Long id
+    - Medico medico
+    - List<Disponibilidad> horariosDisponibles
+}
+
+class Disponibilidad {
+    - Long id
+    - Date fecha
+    - Time horaInicio
+    - Time horaFin
+    - Boolean disponible
+}
+
+class HistorialMedico {
+    - Long id
+    - Paciente paciente
+    - List<EntradaHistorial> entradas
+}
+
+class EntradaHistorial {
+    - Long id
+    - Date fecha
+    - String descripcion
+    - Medico medico
+    - List<String> prescripciones
+}
+
+class Notificacion {
+    - Long id
+    - Usuario usuario
+    - String tipo // 'CITA_NORMAL', 'CITA_URGENTE'
+    - String mensaje
+    - Date fechaHoraEnvio
+    - Boolean leida
+    - Long referenciaCitaId // ID de la cita asociada
+}
+
+Cita <|-- CitaNormal
+Cita <|-- CitaUrgente
+
+Usuario "1" -- "1" Paciente
+Usuario "1" -- "1" Medico
+Usuario "1" -- "1" Credenciales
+Paciente "1" -- "1" HistorialMedico
+HistorialMedico "1" -- "0..*" EntradaHistorial
+EntradaHistorial "1" -- "1" Medico
+Paciente "1" -- "0..*" Cita
+Medico "1" -- "0..*" Cita
+SistemaCitas "1" -- "0..*" Cita
+Medico "1" -- "1" AgendaMedica
+AgendaMedica "1" -- "0..*" Disponibilidad
+CentroSalud "1" -- "0..*" Medico
+CentroSalud "1" -- "0..*" Paciente
+CentroSalud "1" -- "0..*" SistemaCitas
+Usuario "1" -- "0..*" Notificacion
+Cita "1" -- "0..*" Notificacion
+
+@enduml

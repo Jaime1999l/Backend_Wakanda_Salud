@@ -1,0 +1,79 @@
+@startuml
+autonumber
+
+== Solicitud de Cita Normal ==
+actor Paciente
+participant SistemaCitas
+participant CitaNormal
+participant Medico
+participant Notificacion
+
+Paciente -> SistemaCitas: Solicitar Cita Normal (motivo, medicoId, fechaHora)
+SistemaCitas -> Medico: Verificar disponibilidad (fechaHora)
+Medico --> SistemaCitas: Disponibilidad confirmada
+SistemaCitas -> CitaNormal: Crear instancia de cita
+CitaNormal -> SistemaCitas: Guardar cita en el sistema
+SistemaCitas -> Notificacion: Enviar notificación de confirmación al paciente
+Notificacion --> Paciente: Notificación enviada
+
+== Solicitud de Cita Urgente ==
+actor Paciente
+participant SistemaCitas
+participant CitaUrgente
+participant Medico
+participant Notificacion
+
+Paciente -> SistemaCitas: Solicitar Cita Urgente (motivoUrgencia, nivelPrioridad, medicoId)
+SistemaCitas -> Medico: Notificar solicitud de cita urgente
+Medico --> SistemaCitas: Respuesta del médico (Aceptada/Rechazada)
+alt Cita aceptada
+    SistemaCitas -> CitaUrgente: Crear instancia de cita urgente
+    CitaUrgente -> SistemaCitas: Guardar cita en el sistema
+    SistemaCitas -> Notificacion: Enviar notificación de aceptación al paciente
+    Notificacion --> Paciente: Notificación de aceptación
+else Cita rechazada
+    SistemaCitas -> Notificacion: Enviar notificación de rechazo al paciente
+    Notificacion --> Paciente: Notificación de rechazo
+end
+
+== Médico concierta una cita ==
+actor Medico
+participant SistemaCitas
+participant Paciente
+participant CitaNormal
+participant Notificacion
+
+Medico -> SistemaCitas: Crear cita con paciente (pacienteId, fechaHora, motivo)
+SistemaCitas -> Paciente: Verificar disponibilidad del paciente
+Paciente --> SistemaCitas: Disponibilidad confirmada
+SistemaCitas -> CitaNormal: Crear instancia de cita
+CitaNormal -> SistemaCitas: Guardar cita en el sistema
+SistemaCitas -> Notificacion: Enviar notificación al paciente
+Notificacion --> Paciente: Notificación de nueva cita
+
+== Actualización del Historial Médico ==
+actor Medico
+participant Paciente
+participant HistorialMedico
+participant EntradaHistorial
+
+Medico -> Paciente: Consultar datos del paciente
+Paciente --> Medico: Datos del paciente
+Medico -> HistorialMedico: Acceder al historial médico del paciente
+HistorialMedico -> EntradaHistorial: Crear nueva entrada (fecha, descripción, prescripciones)
+EntradaHistorial -> HistorialMedico: Guardar entrada
+HistorialMedico --> Medico: Historial actualizado
+
+== Envío de Recordatorio de Cita ==
+actor SistemaCitas
+participant Cita
+participant Notificacion
+participant Paciente
+
+SistemaCitas -> Cita: Identificar citas próximas
+Cita --> SistemaCitas: Lista de citas pendientes
+SistemaCitas -> Notificacion: Generar recordatorios para citas
+Notificacion -> Paciente: Enviar recordatorio de cita
+Paciente --> Notificacion: Confirmación de recepción
+
+@enduml

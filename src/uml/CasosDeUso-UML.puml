@@ -1,0 +1,56 @@
+@startuml
+left to right direction
+
+actor Usuario
+actor Paciente
+actor Medico
+
+package SistemaAutenticacionAPICentral {
+    usecase "Registrar Usuario" as UC1
+    usecase "Iniciar Sesión" as UC2
+    usecase "Actualizar Perfil" as UC3
+}
+
+package GestionCitas {
+    usecase "Solicitar Cita Normal \n (Paciente/Medico)" as UC4
+    usecase "Solicitar Cita Urgente \n (Paciente)" as UC5
+    usecase "Gestionar Agenda Médica" as UC6
+    usecase "Confirmar Cita" as UC7
+    usecase "Cancelar Cita" as UC8
+    usecase "Visualizar Historial de Citas" as UC9
+}
+
+package Notificaciones {
+    usecase "Enviar Notificación de Confirmación" as UC10
+    usecase "Enviar Recordatorio de Cita" as UC11
+    usecase "Notificar Cambio en Estado de Cita" as UC12
+}
+
+package GestionHistorial {
+    usecase "Actualizar Historial Médico \n (Médico)" as UC13
+    usecase "Visualizar Historial Médico \n (Paciente/Medico)" as UC14
+}
+
+Usuario --> UC1
+Usuario --> UC2
+Usuario --> UC3
+
+Paciente --> UC4
+Paciente --> UC5
+Paciente --> UC9
+Paciente --> UC14
+
+Medico --> UC4
+Medico --> UC6
+Medico --> UC7
+Medico --> UC8
+Medico --> UC13
+Medico --> UC14
+
+UC4 --> UC10
+UC5 --> UC12
+UC7 --> UC12
+UC8 --> UC12
+UC11 --> UC9
+UC13 --> UC14
+@enduml

@@ -1,0 +1,68 @@
+@startuml
+start
+
+:Inicio del sistema;
+
+partition "Autenticación" {
+    :Registrar Usuario;
+    :Iniciar Sesión;
+    :Actualizar Perfil;
+}
+
+partition "Citas Médico" {
+    if ("¿Médico concierta cita normal?") then (Sí)
+        :Médico selecciona paciente y horario;
+        :Verificar disponibilidad del paciente;
+        if ("¿Paciente disponible?") then (Sí)
+            :Crear Cita Normal;
+            :Notificar al paciente;
+        else (No)
+            :Notificar indisponibilidad al médico;
+        endif
+    endif
+}
+
+partition "Gestión de Citas" {
+    if ("¿Paciente solicita cita normal?") then (Sí)
+        :Paciente selecciona médico y horario;
+        :Sistema verifica disponibilidad del médico;
+        if ("¿Médico disponible?") then (Sí)
+            :Crear Cita Normal;
+            :Notificar al paciente;
+        else (No)
+            :Notificar indisponibilidad;
+        endif
+    else
+        if ("¿Paciente solicita cita urgente?") then (Sí)
+            :Paciente envía solicitud de cita urgente;
+            :Notificar al médico;
+            if ("¿Médico acepta?") then (Sí)
+                :Crear Cita Urgente;
+                :Notificar al paciente;
+            else (No)
+                :Notificar rechazo al paciente;
+            endif
+        endif
+    endif
+}
+
+partition "Gestión del Historial" {
+    if ("¿Médico actualiza historial?") then (Sí)
+        :Acceder al historial del paciente;
+        :Añadir nueva entrada;
+        :Guardar cambios;
+    endif
+    if ("¿Paciente visualiza historial?") then (Sí)
+        :Acceder al historial del paciente;
+        :Mostrar datos al paciente;
+    endif
+}
+
+partition "Notificaciones" {
+    :Generar recordatorio de cita;
+    :Enviar notificación al paciente;
+    :Confirmar recepción del paciente;
+}
+
+stop
+@enduml

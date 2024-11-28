@@ -1,6 +1,7 @@
 package org.example.backend_wakanda_salud.rest;
 
 import org.example.backend_wakanda_salud.model.usuarios.UsuarioDTO;
+import org.example.backend_wakanda_salud.service.usuario.UsuarioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

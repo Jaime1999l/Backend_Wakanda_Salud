@@ -3,6 +3,7 @@ package org.example.backend_wakanda_salud.domain.usuarios.pacientes;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.backend_wakanda_salud.domain.centroSalud.CentroSalud;
 import org.example.backend_wakanda_salud.domain.usuarios.Usuario;
 import org.example.backend_wakanda_salud.domain.usuarios.pacientes.historialMedico.HistorialMedico;
 
@@ -25,5 +26,9 @@ public class Paciente extends Usuario {
 
     @OneToOne(mappedBy = "paciente", cascade = CascadeType.ALL, orphanRemoval = true)
     private HistorialMedico historialMedico;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "centro_salud_id")
+    private CentroSalud centroSalud;
 }
 

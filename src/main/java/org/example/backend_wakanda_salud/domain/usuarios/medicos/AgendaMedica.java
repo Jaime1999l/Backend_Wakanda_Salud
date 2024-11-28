@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,6 +22,6 @@ public class AgendaMedica {
     private Medico medico;
 
     @OneToMany(mappedBy = "agendaMedica", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Disponibilidad> horariosDisponibles;
+    private List<Disponibilidad> horariosDisponibles = new ArrayList<>();
 }
 

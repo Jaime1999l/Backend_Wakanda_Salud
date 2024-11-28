@@ -12,9 +12,9 @@ import lombok.Setter;
 @Setter
 public class CitaNormal extends Cita {
 
-    @Column(nullable = false)
+    @Column
     private String motivo;
 
-    @Column(nullable = false)
+    @Column
     private Boolean creadaPorMedico; // Indica si fue generada por el médico
 }

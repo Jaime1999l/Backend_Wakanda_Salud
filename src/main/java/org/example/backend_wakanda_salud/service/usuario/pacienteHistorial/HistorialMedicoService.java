@@ -1,5 +1,6 @@
 package org.example.backend_wakanda_salud.service.usuario.pacienteHistorial;
 
+import org.example.backend_wakanda_salud.domain.usuarios.medicos.Medico;
 import org.example.backend_wakanda_salud.domain.usuarios.pacientes.historialMedico.EntradaHistorial;
 import org.example.backend_wakanda_salud.domain.usuarios.pacientes.historialMedico.HistorialMedico;
 import org.example.backend_wakanda_salud.domain.usuarios.pacientes.Paciente;
@@ -43,59 +44,47 @@ public class HistorialMedicoService {
         return mapToDTO(historial);
     }
 
-    /**
-     * Agregar una entrada al historial médico de un paciente.
-     */
     @Transactional
-    public void agregarEntrada(Long pacienteId, EntradaHistorialDTO entradaDTO) {
+    public Long agregarEntrada(Long medicoId, Long pacienteId, EntradaHistorialDTO entradaDTO) {
+        // Obtener al paciente por su ID, si no se encuentra, lanzar una excepción
+        Paciente paciente = pacienteRepository.findById(pacienteId)
+                .orElseThrow(() -> new RuntimeException("Paciente no encontrado."));
+
+        Medico medico = medicoRepository.findById(medicoId)
+                .orElseThrow(() -> new RuntimeException("Médico no encontrado."));
+
+        // Buscar el historial médico del paciente, si no existe, lanzar una excepción
         HistorialMedico historial = historialMedicoRepository.findByPaciente_Id(pacienteId)
                 .orElseThrow(() -> new RuntimeException("Historial médico no encontrado para el paciente."));
 
-        EntradaHistorial entrada = new EntradaHistorial();
-        entrada.setFecha(entradaDTO.getFecha());
-        entrada.setDescripcion(entradaDTO.getDescripcion());
-        entrada.setPrescripciones(entradaDTO.getPrescripciones());
+        // Crear una nueva entrada en el historial médico
+        EntradaHistorial entradaHistorial = new EntradaHistorial();
+        // Asignar el ID de la entrada
+        entradaHistorial.setDescripcion(entradaDTO.getDescripcion());  // Asignar la descripción de la entrada
+        entradaHistorial.setFecha(entradaDTO.getFecha());  // Asignar la fecha de la entrada
+        entradaHistorial.setMedico(medico);  // Aseguramos que 'medico' no sea nulo
+        entradaHistorial.setHistorialMedico(historial);  // Asociar con el historial del paciente
 
-        // Verificar y asignar el médico
-        if (entradaDTO.getMedicoId() != null) {
-            entrada.setMedico(medicoRepository.findById(entradaDTO.getMedicoId())
-                    .orElseThrow(() -> new RuntimeException("Médico no encontrado.")));
-        }
+        // Guardar la nueva entrada en la base de datos
+        EntradaHistorial savedEntrada = entradaHistorialRepository.save(entradaHistorial);
 
-        entrada.setHistorialMedico(historial);
-        historial.getEntradas().add(entrada);
-        historialMedicoRepository.save(historial);
+        // Retornar el ID de la entrada guardada para poder usarlo más tarde (ej. para eliminarla)
+        return savedEntrada.getId();
     }
+
 
     /**
      * Eliminar una entrada del historial médico.
      */
     @Transactional
     public void eliminarEntrada(Long entradaId) {
-        EntradaHistorial entrada = entradaHistorialRepository.findById(entradaId)
-                .orElseThrow(() -> new RuntimeException("Entrada del historial no encontrada."));
-        entradaHistorialRepository.delete(entrada);
-    }
-
-    /**
-     * Actualizar una entrada del historial médico.
-     */
-    @Transactional
-    public void actualizarEntrada(Long entradaId, EntradaHistorialDTO entradaDTO) {
-        EntradaHistorial entrada = entradaHistorialRepository.findById(entradaId)
-                .orElseThrow(() -> new RuntimeException("Entrada del historial no encontrada."));
-
-        entrada.setFecha(entradaDTO.getFecha());
-        entrada.setDescripcion(entradaDTO.getDescripcion());
-        entrada.setPrescripciones(entradaDTO.getPrescripciones());
-
-        // Verificar y asignar el médico si es necesario
-        if (entradaDTO.getMedicoId() != null) {
-            entrada.setMedico(medicoRepository.findById(entradaDTO.getMedicoId())
-                    .orElseThrow(() -> new RuntimeException("Médico no encontrado.")));
+        try {
+            EntradaHistorial entrada = entradaHistorialRepository.findById(entradaId)
+                    .orElseThrow(() -> new RuntimeException("Entrada del historial no encontrada."));
+            entradaHistorialRepository.delete(entrada);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al eliminar la entrada del historial médico: " + e.getMessage(), e);
         }
-
-        entradaHistorialRepository.save(entrada);
     }
 
     /**
@@ -113,16 +102,6 @@ public class HistorialMedicoService {
 
         paciente.setHistorialMedico(historial);
         pacienteRepository.save(paciente);
-    }
-
-    /**
-     * Eliminar un historial médico.
-     */
-    @Transactional
-    public void eliminarHistorial(Long pacienteId) {
-        HistorialMedico historial = historialMedicoRepository.findByPaciente_Id(pacienteId)
-                .orElseThrow(() -> new RuntimeException("Historial médico no encontrado para el paciente."));
-        historialMedicoRepository.delete(historial);
     }
 
     /**

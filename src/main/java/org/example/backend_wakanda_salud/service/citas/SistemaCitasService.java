@@ -72,6 +72,7 @@ public class SistemaCitasService {
 
         notificarCitaCreada(cita, "CITA_NORMAL");
 
+        System.out.println("Cita normal agregada al sistema de citas.");
         return citaId;
     }
 
@@ -98,9 +99,10 @@ public class SistemaCitasService {
                 .orElseThrow(() -> new RuntimeException("Sistema de citas no encontrado."));
 
         Cita cita = citaService.obtenerCitaPorId(citaId);
-        sistema.getCitas().remove(cita);
-        citaService.eliminarCita(citaId);
+        sistema.getCitas().remove(cita); // Eliminar la cita del sistema de citas
+        citaService.eliminarCita(citaId); // Eliminar la cita de la base de datos
 
+        // Enviar notificación al paciente
         notificacionService.enviarNotificacion(
                 cita.getPaciente().getId(),
                 "CITA_ELIMINADA",
@@ -108,6 +110,7 @@ public class SistemaCitasService {
                 citaId
         );
 
+        // Enviar notificación al médico según el tipo de cita
         if (cita instanceof CitaNormal) {
             notificacionService.enviarNotificacion(
                     cita.getMedico().getId(),

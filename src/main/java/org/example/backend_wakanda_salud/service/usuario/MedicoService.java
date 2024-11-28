@@ -34,38 +34,34 @@ public class MedicoService {
         this.usuarioService = usuarioService;
     }
 
-    // CRUD
-
     @Transactional
     public Long create(MedicoDTO medicoDTO) {
-        // Verificar si el usuario será un médico
         if (medicoDTO.getRoles().contains("MEDICO")) {
-            // Crear la entidad específica del médico
             Medico medico = new Medico();
             mapToEntity(medicoDTO, medico);
 
-            // Validar y asignar especialidad
             if (medicoDTO.getEspecialidad() == null || medicoDTO.getEspecialidad().isEmpty()) {
                 medico.setEspecialidad(generarEspecialidadAleatoria());
             } else {
                 medico.setEspecialidad(medicoDTO.getEspecialidad());
             }
 
-            // Validar y asignar número de licencia
             if (medicoDTO.getNumeroLicencia() == null || medicoDTO.getNumeroLicencia().isEmpty()) {
                 medico.setNumeroLicencia(generarNumeroLicenciaAleatorio());
             } else {
                 medico.setNumeroLicencia(medicoDTO.getNumeroLicencia());
             }
 
-            // Configurar agenda médica
-            if (medico.getAgenda() == null) {
-                AgendaMedica agenda = new AgendaMedica();
-                medico.setAgenda(agenda);
+            Medico medicoGuardado = medicoRepository.save(medico);
 
-                // Generar disponibilidad aleatoria para la agenda
-                usuarioService.generarDisponibilidadAleatoria(agenda);
-            }
+            AgendaMedica agenda = new AgendaMedica();
+            agenda.setMedico(medicoGuardado);
+            AgendaMedica agendaGuardada = agendaMedicaRepository.save(agenda);
+
+            medicoGuardado.setAgenda(agendaGuardada);
+            medicoRepository.save(medicoGuardado);
+
+            usuarioService.generarDisponibilidadAleatoria(agendaGuardada);
 
             if (medico.getCentroSalud() == null) {
                 List<CentroSalud> centrosDisponibles = centroSaludRepository.findAll();
@@ -76,21 +72,22 @@ public class MedicoService {
                     throw new RuntimeException("No hay centros de salud disponibles para asignar.");
                 }
             }
-            return medicoRepository.save(medico).getId();
+            return medicoGuardado.getId();
         }
 
-        // Si no tiene rol válido, lanzamos excepción
         throw new RuntimeException("El usuario debe tener el rol de: MEDICO");
     }
 
     public String generarEspecialidadAleatoria() {
         List<String> especialidades = List.of(
                 "Cardiología", "Pediatría", "Neurología", "Dermatología",
-                "Ginecología", "Ortopedia", "Oncología", "Psiquiatría",
-                "Oftalmología", "Urología", "Endocrinología", "Anestesiología"
+                "Ginecología", "Traumatología", "Oncología", "Psiquiatría",
+                "Oftalmología", "Urología", "Endocrinología", "Anestesiología",
+                "Reumatología", "Geriatría", "Nefrología", "Hematología",
+                "Medicina Interna", "Medicina General", "Cirugía General",
+                "Cirugía Plástica", "Cirugía Cardiovascular", "Cirugía Pediátrica"
         );
-        int indiceAleatorio = ThreadLocalRandom.current().nextInt(especialidades.size());
-        return especialidades.get(indiceAleatorio);
+        return especialidades.get(ThreadLocalRandom.current().nextInt(especialidades.size()));
     }
 
     public String generarNumeroLicenciaAleatorio() {
@@ -126,8 +123,6 @@ public class MedicoService {
         medicoRepository.deleteById(id);
     }
 
-    // Métodos de mapeo
-
     public MedicoDTO mapToDTO(Medico medico) {
         MedicoDTO dto = new MedicoDTO();
         dto.setId(medico.getId());
@@ -143,4 +138,3 @@ public class MedicoService {
         return medico;
     }
 }
-

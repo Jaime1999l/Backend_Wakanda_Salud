@@ -12,9 +12,9 @@ import lombok.Setter;
 @Setter
 public class CitaUrgente extends Cita {
 
-    @Column(nullable = false)
+    @Column
     private String motivoUrgencia;
 
-    @Column(nullable = false)
+    @Column
     private String nivelPrioridad; // 'ALTA', 'MEDIA', 'BAJA'
 }

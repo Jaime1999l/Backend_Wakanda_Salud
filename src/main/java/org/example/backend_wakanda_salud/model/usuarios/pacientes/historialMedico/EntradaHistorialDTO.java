@@ -26,5 +26,4 @@ public class EntradaHistorialDTO {
 
     private List<String> prescripciones;
 
-    private HistorialMedicoDTO historialMedico;
 }

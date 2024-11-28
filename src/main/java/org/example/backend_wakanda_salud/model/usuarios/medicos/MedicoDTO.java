@@ -19,4 +19,6 @@ public class MedicoDTO extends UsuarioDTO {
     private String numeroLicencia;
 
     private Long agendaId;
+
+    private Long centroSaludId;
 }

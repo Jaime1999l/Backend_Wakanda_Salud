@@ -1,8 +1,10 @@
 package org.example.backend_wakanda_salud.service.usuario;
 
+import org.example.backend_wakanda_salud.domain.centroSalud.CentroSalud;
 import org.example.backend_wakanda_salud.domain.usuarios.medicos.Medico;
 import org.example.backend_wakanda_salud.domain.usuarios.medicos.AgendaMedica;
 import org.example.backend_wakanda_salud.model.usuarios.medicos.MedicoDTO;
+import org.example.backend_wakanda_salud.repos.CentroSaludRepository;
 import org.example.backend_wakanda_salud.repos.MedicoRepository;
 import org.example.backend_wakanda_salud.repos.AgendaMedicaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,8 @@ public class MedicoService {
 
     @Autowired
     private UsuarioService usuarioService;
+    @Autowired
+    private CentroSaludRepository centroSaludRepository;
 
     // CRUD
 
@@ -58,6 +62,15 @@ public class MedicoService {
                 usuarioService.generarDisponibilidadAleatoria(agenda);
             }
 
+            if (medico.getCentroSalud() == null) {
+                List<CentroSalud> centrosDisponibles = centroSaludRepository.findAll();
+                if (!centrosDisponibles.isEmpty()) {
+                    CentroSalud centroAleatorio = centrosDisponibles.get((int) (Math.random() * centrosDisponibles.size()));
+                    medico.setCentroSalud(centroAleatorio);
+                } else {
+                    throw new RuntimeException("No hay centros de salud disponibles para asignar.");
+                }
+            }
             return medicoRepository.save(medico).getId();
         }
 
@@ -65,7 +78,7 @@ public class MedicoService {
         throw new RuntimeException("El usuario debe tener el rol de: MEDICO");
     }
 
-    private String generarEspecialidadAleatoria() {
+    public String generarEspecialidadAleatoria() {
         List<String> especialidades = List.of(
                 "Cardiología", "Pediatría", "Neurología", "Dermatología",
                 "Ginecología", "Ortopedia", "Oncología", "Psiquiatría",
@@ -75,7 +88,7 @@ public class MedicoService {
         return especialidades.get(indiceAleatorio);
     }
 
-    private String generarNumeroLicenciaAleatorio() {
+    public String generarNumeroLicenciaAleatorio() {
         String prefijo = "LIC-";
         int numero = ThreadLocalRandom.current().nextInt(100000, 999999);
         return prefijo + numero;

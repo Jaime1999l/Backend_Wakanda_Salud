@@ -1,5 +1,6 @@
 package org.example.backend_wakanda_salud.service.usuario;
 
+import org.example.backend_wakanda_salud.domain.centroSalud.CentroSalud;
 import org.example.backend_wakanda_salud.domain.usuarios.Usuario;
 import org.example.backend_wakanda_salud.domain.usuarios.medicos.AgendaMedica;
 import org.example.backend_wakanda_salud.domain.usuarios.medicos.Disponibilidad;
@@ -10,19 +11,21 @@ import org.example.backend_wakanda_salud.model.usuarios.UsuarioDTO;
 import org.example.backend_wakanda_salud.model.usuarios.medicos.DisponibilidadDTO;
 import org.example.backend_wakanda_salud.model.usuarios.medicos.MedicoDTO;
 import org.example.backend_wakanda_salud.model.usuarios.pacientes.PacienteDTO;
-import org.example.backend_wakanda_salud.repos.AgendaMedicaRepository;
-import org.example.backend_wakanda_salud.repos.MedicoRepository;
-import org.example.backend_wakanda_salud.repos.PacienteRepository;
-import org.example.backend_wakanda_salud.repos.UsuarioRepository;
+import org.example.backend_wakanda_salud.repos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.Random;
 
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +42,15 @@ public class UsuarioService {
 
     @Autowired
     private AgendaMedicaRepository agendaMedicaRepository;
+
+    @Autowired
+    private MedicoService medicoService;
+
+    @Autowired
+    private CentroSaludRepository centroSaludRepository;
+
+    @Autowired
+    private HistorialMedicoRepository historialMedicoRepository;
 
     // CRUD
 
@@ -64,18 +76,46 @@ public class UsuarioService {
             Medico medico = new Medico();
             mapToEntity(usuarioDTO, medico);
 
-            // Los atributos específicos de `Medico` están presentes en `MedicoDTO`
+            // Validar y asignar especialidad
             if (usuarioDTO instanceof MedicoDTO medicoDTO) {
-                medico.setEspecialidad(medicoDTO.getEspecialidad());
-                medico.setNumeroLicencia(medicoDTO.getNumeroLicencia());
+                if (medicoDTO.getEspecialidad() == null || medicoDTO.getEspecialidad().isEmpty()) {
+                    medico.setEspecialidad(medicoService.generarEspecialidadAleatoria());
+                } else {
+                    medico.setEspecialidad(medicoDTO.getEspecialidad());
+                }
 
-                // Agregar disponibilidad aleatoria
+                // Validar y asignar número de licencia
+                if (medicoDTO.getNumeroLicencia() == null || medicoDTO.getNumeroLicencia().isEmpty()) {
+                    medico.setNumeroLicencia(medicoService.generarNumeroLicenciaAleatorio());
+                } else {
+                    medico.setNumeroLicencia(medicoDTO.getNumeroLicencia());
+                }
+            } else {
+                throw new RuntimeException("Los datos específicos de médico son obligatorios.");
+            }
+
+            // Configurar agenda médica
+            if (medico.getAgenda() == null) {
                 AgendaMedica agenda = new AgendaMedica();
                 medico.setAgenda(agenda);
 
+                // Generar disponibilidad aleatoria para la agenda
                 generarDisponibilidadAleatoria(agenda);
             } else {
-                throw new RuntimeException("Los datos específicos de médico son obligatorios.");
+                medico.setAgenda(agendaMedicaRepository.save(medico.getAgenda()));
+            }
+
+            // Asignar un centro de salud aleatorio si no está especificado
+            if (medico.getCentroSalud() == null) {
+                List<CentroSalud> centrosDisponibles = centroSaludRepository.findAll();
+                if (!centrosDisponibles.isEmpty()) {
+                    CentroSalud centroAleatorio = centrosDisponibles.get((int) (Math.random() * centrosDisponibles.size()));
+                    medico.setCentroSalud(centroAleatorio);
+                } else {
+                    throw new RuntimeException("No hay centros de salud disponibles para asignar.");
+                }
+            } else{
+                medico.setCentroSalud(centroSaludRepository.save(medico.getCentroSalud()));
             }
 
             return medicoRepository.save(medico).getId();
@@ -89,14 +129,28 @@ public class UsuarioService {
 
             // Los atributos específicos de `Paciente` están presentes en `PacienteDTO`
             if (usuarioDTO instanceof PacienteDTO pacienteDTO) {
-                paciente.setNumeroHistoriaClinica(pacienteDTO.getNumeroHistoriaClinica());
-                paciente.setFechaNacimiento(pacienteDTO.getFechaNacimiento());
-                paciente.setDireccion(pacienteDTO.getDireccion());
+                if (pacienteDTO.getNumeroHistoriaClinica() == null || pacienteDTO.getNumeroHistoriaClinica().isEmpty()) {
+                    paciente.setNumeroHistoriaClinica(generarNumeroHistoriaClinicaAleatorio());
+                } else {
+                    paciente.setNumeroHistoriaClinica(pacienteDTO.getNumeroHistoriaClinica());
+                }
+                if (pacienteDTO.getFechaNacimiento() == null) {
+                    paciente.setFechaNacimiento(generarFechaNacimientoAleatoria());
+                } else {
+                    paciente.setFechaNacimiento(pacienteDTO.getFechaNacimiento());
+                }
 
+                if (pacienteDTO.getDireccion() == null || pacienteDTO.getDireccion().isEmpty()) {
+                    paciente.setDireccion(generarDireccionAleatoria());
+                } else {
+                    paciente.setDireccion(pacienteDTO.getDireccion());
+                }
                 // Crear el historial médico
                 HistorialMedico historialMedico = new HistorialMedico();
                 historialMedico.setPaciente(paciente);
+                historialMedico.setEntradas(new ArrayList<>());
                 paciente.setHistorialMedico(historialMedico);
+                historialMedicoRepository.save(historialMedico);
             } else {
                 throw new RuntimeException("Los datos específicos de paciente son obligatorios.");
             }
@@ -151,6 +205,8 @@ public class UsuarioService {
         usuario.setApellidos(dto.getApellidos());
         usuario.setEmail(dto.getEmail());
     }
+
+    // Métodos auxiliares
 
     @Transactional
     public void agregarDisponibilidad(Long medicoId, DisponibilidadDTO disponibilidadDTO) {
@@ -254,5 +310,44 @@ public class UsuarioService {
         }
 
         return null; // No hay horarios disponibles
+    }
+
+    public String generarDireccionAleatoria() {
+        String[] calles = {
+                "Calle Mayor", "Gran Vía", "Paseo de la Castellana", "Calle Alcalá",
+                "Calle Serrano", "Calle Princesa", "Calle Atocha", "Calle Goya"
+        };
+
+        int numero = (int) (Math.random() * 200) + 1; // Números entre 1 y 200
+        String calleAleatoria = calles[(int) (Math.random() * calles.length)];
+        return calleAleatoria + " " + numero + ", Madrid";
+    }
+
+    public Date generarFechaNacimientoAleatoria() {
+        int edadMinima = 18; // Edad mínima
+        int edadMaxima = 90; // Edad máxima
+
+        LocalDate hoy = LocalDate.now();
+        LocalDate fechaInicio = hoy.minus(Period.ofYears(edadMaxima));
+        LocalDate fechaFin = hoy.minus(Period.ofYears(edadMinima));
+
+        long start = fechaInicio.toEpochDay();
+        long end = fechaFin.toEpochDay();
+        long randomDay = ThreadLocalRandom.current().nextLong(start, end + 1);
+
+        LocalDate randomDate = LocalDate.ofEpochDay(randomDay);
+        return Date.from(randomDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    public String generarNumeroHistoriaClinicaAleatorio() {
+        int longitud = 10; // Longitud del número de historia clínica
+        StringBuilder numeroHistoria = new StringBuilder();
+
+        for (int i = 0; i < longitud; i++) {
+            int digito = (int) (Math.random() * 10); // Dígitos entre 0 y 9
+            numeroHistoria.append(digito);
+        }
+
+        return numeroHistoria.toString();
     }
 }

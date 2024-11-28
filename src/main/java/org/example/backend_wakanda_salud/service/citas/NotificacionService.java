@@ -53,24 +53,6 @@ public class NotificacionService {
                 .collect(Collectors.toList());
     }
 
-    // Marcar una notificación como leída
-    @Transactional
-    public void marcarComoLeida(Long notificacionId) {
-        Notificacion notificacion = notificacionRepository.findById(notificacionId)
-                .orElseThrow(() -> new RuntimeException("Notificación no encontrada."));
-        notificacion.setLeida(true);
-        notificacionRepository.save(notificacion);
-    }
-
-    // Eliminar una notificación
-    @Transactional
-    public void eliminarNotificacion(Long notificacionId) {
-        if (!notificacionRepository.existsById(notificacionId)) {
-            throw new RuntimeException("Notificación no encontrada.");
-        }
-        notificacionRepository.deleteById(notificacionId);
-    }
-
     // Métodos de mapeo entre entidad y DTO
     public NotificacionDTO mapToDTO(Notificacion notificacion) {
         NotificacionDTO dto = new NotificacionDTO();

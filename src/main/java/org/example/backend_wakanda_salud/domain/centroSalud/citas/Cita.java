@@ -3,6 +3,7 @@ package org.example.backend_wakanda_salud.domain.centroSalud.citas;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.backend_wakanda_salud.domain.centroSalud.SistemaCitas;
 import org.example.backend_wakanda_salud.domain.usuarios.medicos.Medico;
 import org.example.backend_wakanda_salud.domain.usuarios.pacientes.Paciente;
 
@@ -33,4 +34,8 @@ public abstract class Cita {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "medico_id", nullable = false)
     private Medico medico;
+
+    @ManyToOne
+    @JoinColumn(name = "sistema_citas_id")
+    private SistemaCitas sistemaCitas;
 }

@@ -3,6 +3,7 @@ package org.example.backend_wakanda_salud.model.centroSalud.citas;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.backend_wakanda_salud.model.centroSalud.SistemaCitasDTO;
 
 import java.util.Date;
 
@@ -21,5 +22,7 @@ public class CitaDTO {
     private Long pacienteId;
 
     private Long medicoId;
+
+    private SistemaCitasDTO sistemaCitas;
 }
 

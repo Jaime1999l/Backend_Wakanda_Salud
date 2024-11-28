@@ -28,6 +28,8 @@ public class CitaService {
 
     @Autowired
     private NotificacionRepository notificacionRepository;
+    @Autowired
+    private SistemaCitasRepository sistemaCitasRepository;
 
     public CitaService(CitaNormalRepository citaNormalRepository,
                        CitaUrgenteRepository citaUrgenteRepository,
@@ -59,6 +61,8 @@ public class CitaService {
         cita.setCreadaPorMedico(dto.getCreadaPorMedico());
         cita.setPaciente(paciente);
         cita.setMedico(medico);
+        cita.setSistemaCitas(sistemaCitasRepository.findByCentroSalud_Id(medico.getCentroSalud().getId()).get(0));
+        sistemaCitasRepository.findByCentroSalud_Id(medico.getCentroSalud().getId()).get(0).getCitas().add(cita);
 
         CitaNormal savedCita = citaNormalRepository.save(cita);
 

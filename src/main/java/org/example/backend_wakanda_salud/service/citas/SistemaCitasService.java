@@ -46,6 +46,7 @@ public class SistemaCitasService {
         SistemaCitas sistema = new SistemaCitas();
         sistema.setDescripcion(descripcion);
         sistema.setCentroSalud(centroSalud);
+        sistema.setCitas(List.of());
 
         return sistemaCitasRepository.save(sistema).getId();
     }

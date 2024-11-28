@@ -20,6 +20,9 @@ public class SistemaCitasService {
     @Autowired
     private CentroSaludRepository centroSaludRepository;
 
+    @Autowired
+    private CitaService citaService;
+
     private final SistemaCitasRepository sistemaCitasRepository;
     private final CitaNormalRepository citaNormalRepository;
     private final CitaUrgenteRepository citaUrgenteRepository;
@@ -37,20 +40,16 @@ public class SistemaCitasService {
 
     @Transactional
     public Long crearSistemaCitas(String descripcion, Long centroSaludId) {
-        // Buscar el centro de salud asociado por su ID
         CentroSalud centroSalud = centroSaludRepository.findById(centroSaludId)
                 .orElseThrow(() -> new RuntimeException("Centro de salud no encontrado."));
 
-        // Crear una nueva instancia de SistemaCitas
         SistemaCitas sistema = new SistemaCitas();
         sistema.setDescripcion(descripcion);
-        sistema.setCentroSalud(centroSalud); // Asociar el centro de salud existente
+        sistema.setCentroSalud(centroSalud);
 
-        // Guardar el sistema de citas y retornar su ID
         return sistemaCitasRepository.save(sistema).getId();
     }
 
-    // Obtener todas las citas (normales y urgentes) de un sistema
     @Transactional(readOnly = true)
     public List<Cita> obtenerCitasDeSistema(Long sistemaId) {
         SistemaCitas sistema = sistemaCitasRepository.findById(sistemaId)
@@ -58,9 +57,8 @@ public class SistemaCitasService {
         return sistema.getCitas();
     }
 
-    // Agregar una cita normal al sistema
     @Transactional
-    public Long agregarCitaNormal(Long sistemaId, CitaNormalDTO citaNormalDTO, CitaService citaService) {
+    public Long agregarCitaNormal(Long sistemaId, CitaNormalDTO citaNormalDTO) {
         SistemaCitas sistema = sistemaCitasRepository.findById(sistemaId)
                 .orElseThrow(() -> new RuntimeException("Sistema de citas no encontrado."));
 
@@ -70,12 +68,14 @@ public class SistemaCitasService {
 
         sistema.getCitas().add(cita);
         sistemaCitasRepository.save(sistema);
+
+        notificarCitaCreada(cita, "CITA_NORMAL");
+
         return citaId;
     }
 
-    // Agregar una cita urgente al sistema
     @Transactional
-    public Long agregarCitaUrgente(Long sistemaId, CitaUrgenteDTO citaUrgenteDTO, CitaService citaService) {
+    public Long agregarCitaUrgente(Long sistemaId, CitaUrgenteDTO citaUrgenteDTO) {
         SistemaCitas sistema = sistemaCitasRepository.findById(sistemaId)
                 .orElseThrow(() -> new RuntimeException("Sistema de citas no encontrado."));
 
@@ -85,17 +85,59 @@ public class SistemaCitasService {
 
         sistema.getCitas().add(cita);
         sistemaCitasRepository.save(sistema);
+
+        notificarCitaCreada(cita, "CITA_URGENTE");
+
         return citaId;
     }
 
-    // Eliminar una cita de un sistema
     @Transactional
-    public void eliminarCitaDeSistema(Long sistemaId, Long citaId, CitaService citaService) {
+    public void eliminarCitaDeSistema(Long sistemaId, Long citaId) {
         SistemaCitas sistema = sistemaCitasRepository.findById(sistemaId)
                 .orElseThrow(() -> new RuntimeException("Sistema de citas no encontrado."));
 
         Cita cita = citaService.obtenerCitaPorId(citaId);
         sistema.getCitas().remove(cita);
         citaService.eliminarCita(citaId);
+
+        notificacionService.enviarNotificacion(
+                cita.getPaciente().getId(),
+                "CITA_ELIMINADA",
+                "Tu cita ha sido eliminada.",
+                citaId
+        );
+
+        if (cita instanceof CitaNormal) {
+            notificacionService.enviarNotificacion(
+                    cita.getMedico().getId(),
+                    "CITA_ELIMINADA",
+                    "Una cita normal asignada ha sido eliminada.",
+                    citaId
+            );
+        } else if (cita instanceof CitaUrgente) {
+            notificacionService.enviarNotificacion(
+                    cita.getMedico().getId(),
+                    "CITA_ELIMINADA",
+                    "Una cita urgente asignada ha sido eliminada.",
+                    citaId
+            );
+        }
+    }
+
+    // Función auxiliar para notificar creación de citas
+    private void notificarCitaCreada(Cita cita, String tipoCita) {
+        notificacionService.enviarNotificacion(
+                cita.getPaciente().getId(),
+                tipoCita,
+                "Tu " + (tipoCita.equals("CITA_NORMAL") ? "cita normal" : "cita urgente") + " ha sido creada exitosamente.",
+                cita.getId()
+        );
+
+        notificacionService.enviarNotificacion(
+                cita.getMedico().getId(),
+                tipoCita,
+                "Tienes una nueva " + (tipoCita.equals("CITA_NORMAL") ? "cita normal" : "cita urgente") + " asignada.",
+                cita.getId()
+        );
     }
 }

@@ -24,6 +24,7 @@ public class PacienteService {
 
     @Autowired
     private HistorialMedicoService historialMedicoService;
+
     @Autowired
     private HistorialMedicoRepository historialMedicoRepository;
 

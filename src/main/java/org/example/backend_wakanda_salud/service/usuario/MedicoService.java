@@ -8,6 +8,7 @@ import org.example.backend_wakanda_salud.repos.CentroSaludRepository;
 import org.example.backend_wakanda_salud.repos.MedicoRepository;
 import org.example.backend_wakanda_salud.repos.AgendaMedicaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,9 +26,13 @@ public class MedicoService {
     private AgendaMedicaRepository agendaMedicaRepository;
 
     @Autowired
-    private UsuarioService usuarioService;
-    @Autowired
     private CentroSaludRepository centroSaludRepository;
+
+    private final UsuarioService usuarioService;
+
+    public MedicoService(@Lazy UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
 
     // CRUD
 

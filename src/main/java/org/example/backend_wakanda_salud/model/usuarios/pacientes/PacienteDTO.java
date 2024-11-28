@@ -4,14 +4,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.backend_wakanda_salud.model.usuarios.UsuarioDTO;
 
 import java.util.Date;
 
 @Getter
 @Setter
-public class PacienteDTO {
-
-    private Long id;
+public class PacienteDTO extends UsuarioDTO {
 
     @NotNull
     @Size(max = 255)
@@ -23,8 +22,6 @@ public class PacienteDTO {
     @NotNull
     @Size(max = 255)
     private String direccion;
-
-    private Long usuarioId;
 
     private Long historialMedicoId;
 }

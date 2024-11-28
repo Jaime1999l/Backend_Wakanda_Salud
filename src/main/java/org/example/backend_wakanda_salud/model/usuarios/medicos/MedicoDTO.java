@@ -4,12 +4,11 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.backend_wakanda_salud.model.usuarios.UsuarioDTO;
 
 @Getter
 @Setter
-public class MedicoDTO {
-
-    private Long id;
+public class MedicoDTO extends UsuarioDTO {
 
     @NotNull
     @Size(max = 255)
@@ -18,8 +17,6 @@ public class MedicoDTO {
     @NotNull
     @Size(max = 255)
     private String numeroLicencia;
-
-    private Long usuarioId;
 
     private Long agendaId;
 }

@@ -215,16 +215,19 @@ public class CitaService {
     }
 
     @Transactional(readOnly = true)
-    public CitaNormal obtenerCitaNormalPorId(Long citaId) {
-        return citaNormalRepository.findById(citaId)
+    public CitaNormalDTO obtenerCitaNormalPorId(Long citaId) {
+        CitaNormal citaNormal = citaNormalRepository.findById(citaId)
                 .orElseThrow(() -> new RuntimeException("Cita normal no encontrada."));
+        return mapToDTO(citaNormal);
     }
 
     @Transactional(readOnly = true)
-    public CitaUrgente obtenerCitaUrgentePorId(Long citaId) {
-        return citaUrgenteRepository.findById(citaId)
+    public CitaUrgenteDTO obtenerCitaUrgentePorId(Long citaId) {
+        CitaUrgente citaUrgente = citaUrgenteRepository.findById(citaId)
                 .orElseThrow(() -> new RuntimeException("Cita urgente no encontrada."));
+        return mapToDTO(citaUrgente);
     }
+
 
     @Transactional(readOnly = true)
     public Cita obtenerCitaPorId(Long citaId) {
@@ -299,4 +302,28 @@ public class CitaService {
                 cita.getId()
         );
     }
+
+    // Metodo para mapear CitaNormal a CitaNormalDTO
+    private CitaNormalDTO mapToDTO(CitaNormal citaNormal) {
+        CitaNormalDTO dto = new CitaNormalDTO();
+        dto.setId(citaNormal.getId());
+        dto.setFechaHora(citaNormal.getFechaHora());
+        dto.setPacienteId(citaNormal.getPaciente().getId());
+        dto.setMedicoId(citaNormal.getMedico().getId());
+        dto.setMotivo(citaNormal.getMotivo());
+        return dto;
+    }
+
+    // Metodo para mapear CitaUrgente a CitaUrgenteDTO
+    private CitaUrgenteDTO mapToDTO(CitaUrgente citaUrgente) {
+        CitaUrgenteDTO dto = new CitaUrgenteDTO();
+        dto.setId(citaUrgente.getId());
+        dto.setFechaHora(citaUrgente.getFechaHora());
+        dto.setPacienteId(citaUrgente.getPaciente().getId());
+        dto.setMedicoId(citaUrgente.getMedico().getId());
+        dto.setMotivoUrgencia(citaUrgente.getMotivoUrgencia());
+        dto.setNivelPrioridad(citaUrgente.getNivelPrioridad());
+        return dto;
+    }
+
 }

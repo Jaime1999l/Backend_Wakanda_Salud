@@ -5,4 +5,26 @@ services:
       - MYSQL_DATABASE=Backend_Wakanda_Salud
       - MYSQL_ROOT_PASSWORD=P4ssword!
     ports:
-      - 3307:3306
+      - "3307:3306"
+    container_name: mysql-wakanda
+    networks:
+      - backend-network
+
+  backend-wakanda-salud:
+    build:
+      context: ./  # Directorio del Dockerfile del microservicio
+    ports:
+      - "8080:8080"  # Mapea el puerto para el microservicio
+    container_name: backend-wakanda-salud
+    networks:
+      - backend-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+      - eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-wakanda:3306/Backend_Wakanda_Salud?serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=P4ssword!
+
+networks:
+  backend-network:
+    external: true  # Usa la misma red compartida con el Eureka Server

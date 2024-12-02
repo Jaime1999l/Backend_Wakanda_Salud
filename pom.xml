@@ -9,7 +9,7 @@
     <groupId>org.main_java</groupId>
     <artifactId>Backend_Wakanda_Salud</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>Springboot</name>
     <dependencies>
         <dependency>
@@ -133,6 +133,12 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
         </dependency>
+        <!-- Maven Invoker for programmatically running Maven commands -->
+        <dependency>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-invoker</artifactId>
+            <version>3.2.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -149,40 +155,6 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.15.0</version>
-                <executions>
-                    <execution>
-                        <id>nodeAndNpmSetup</id>
-                        <goals>
-                            <goal>install-node-and-npm</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>npmInstall</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>install</arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>npmRunBuild</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>run build</arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <nodeVersion>v20.17.0</nodeVersion>
                 </configuration>
             </plugin>
         </plugins>

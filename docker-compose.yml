@@ -1,8 +1,42 @@
 services:
   mysql:
-    image: mysql:9.0
+    image: mysql:8.0
     environment:
       - MYSQL_DATABASE=Backend_Wakanda_Salud
-      - MYSQL_ROOT_PASSWORD=P4ssword!
+      - MYSQL_ROOT_PASSWORD=P@ssw0rd
     ports:
-      - 3307:3306
+      - "3307:3306"
+    container_name: mysql-wakanda
+    networks:
+      - backend-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  backend-wakanda-salud:
+    build:
+      context: ./  # Directorio del Dockerfile del microservicio
+    ports:
+      - "8082:8081"  # Mapea el puerto para el microservicio
+    container_name: backend-wakanda-salud
+    networks:
+      - backend-network
+    environment:
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=default
+      - eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-wakanda:3306/Backend_Wakanda_Salud?serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=P@ssw0rd
+    entrypoint: [ "./wait-for-it.sh", "mysql-wakanda:3306", "--", "java", "-jar", "/app/backend_wakanda_salud.jar" ]
+
+
+
+volumes:
+  mysql-data:
+
+networks:
+  backend-network:
+    external: true

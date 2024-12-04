@@ -1,8 +1,13 @@
 spring:
   datasource:
+
+    # url: ${SPRING_DATASOURCE_URL:jdbc:mysql://mysql-wakanda:3306/Backend_Wakanda_Salud?serverTimezone=UTC}
+    # username: ${SPRING_DATASOURCE_USERNAME:root}
+    # password: ${SPRING_DATASOURCE_PASSWORD:P@ssw0rd}
     url: jdbc:mysql://mysql-wakanda:3306/Backend_Wakanda_Salud?serverTimezone=UTC
     username: root
     password: P@ssw0rd
+
     hikari:
       connection-timeout: 30000
       maximum-pool-size: 10
@@ -50,9 +55,16 @@ management:
         include: "*"
 
 eureka:
+  #instance:
+   # hostname: backend-wakanda-salud  # Alias DNS válido en la red
+    #prefer-ip-address: true  # Usar la IP en lugar del hostname
   client:
     service-url:
-      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/%7D  # Variable flexible
+      defaultZone: http://eureka-server:8761/eureka/ # ${EUREKA_SERVER_URL:http://eureka-server:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+
+
 
 metrics:
   export:

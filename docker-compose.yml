@@ -30,7 +30,12 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-wakanda:3306/Backend_Wakanda_Salud?serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=P@ssw0rd
-    entrypoint: [ "./wait-for-it.sh", "mysql-wakanda:3306", "--", "java", "-jar", "/app/backend_wakanda_salud.jar" ]
+    entrypoint: [
+      "./wait-for-it.sh", "eureka-server:8761", "-t", "60", "--",
+      "./wait-for-it.sh", "mysql-wakanda:3306", "-t", "60", "--",
+      "java", "-jar", "/app/backend_wakanda_salud.jar"
+    ]
+
 
 
 

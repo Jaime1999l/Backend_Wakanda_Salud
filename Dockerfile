@@ -28,7 +28,7 @@ RUN apt-get update && apt-get install -y curl && \
     chmod +x /app/wait-for-it.sh
 
 # Expose the port the server will listen on
-EXPOSE 8081
+EXPOSE 8080
 
 # Command to run the application
 ENTRYPOINT ["./wait-for-it.sh", "mysql-wakanda:3306", "--", "java", "-jar", "/app/backend_wakanda_salud.jar"]

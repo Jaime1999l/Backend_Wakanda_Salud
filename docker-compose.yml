@@ -9,17 +9,12 @@ services:
     container_name: mysql-wakanda
     networks:
       - backend-network
-    healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      interval: 10s
-      timeout: 5s
-      retries: 3
 
   backend-wakanda-salud:
     build:
       context: ./  # Directorio del Dockerfile del microservicio
     ports:
-      - "8082:8081"  # Mapea el puerto para el microservicio
+      - "8080:8090"  # Mapea el puerto para el microservicio
     container_name: backend-wakanda-salud
     networks:
       - backend-network

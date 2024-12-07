@@ -17,6 +17,7 @@ spring:
       ddl-auto: update
     open-in-view: false
     properties:
+      dialect: org.hibernate.dialect.MySQLDialect
       hibernate:
         jdbc:
           lob:

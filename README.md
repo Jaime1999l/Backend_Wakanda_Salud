@@ -7,6 +7,7 @@ https://github.com/Sistema-Gestion-Servicios-Wakanda-J-M-N/Backend_Wakanda_Salud
 - Jaime López Díaz
 - Marcos García Benito
 - Nicolas Jimenez
+- Juan Manuel
 
 # Backend Wakanda Salud
 

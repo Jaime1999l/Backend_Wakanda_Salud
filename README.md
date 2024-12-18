@@ -1,15 +1,30 @@
-# LINKs
+# Backend Wakanda Salud
 
-https://github.com/Sistema-Gestion-Servicios-Wakanda-J-M-N/Backend_Wakanda_Salud.git
 
-# Participantes del proyecto
+1. https://github.com/Sistema-Gestion-Servicios-Wakanda-J-M-N/Frontend-Wakanda
+2. https://github.com/Sistema-Gestion-Servicios-Wakanda-J-M-N/Backend-Wakanda-API-Central   -> API-Central (Gestiona los microservicios y muestra un tablero de Wakanda).
+3. https://github.com/Sistema-Gestion-Servicios-Wakanda-J-M-N/Eureka-Server   -> Eureka-Server/Grafana/Prometheus
+4. https://github.com/Sistema-Gestion-Servicios-Wakanda-J-M-N/InitManager   -> Lanza el Eureka-Server/Prometheus/Grafana y ejecuta un script para lanzar los microservicios.
+5. https://github.com/Sistema-Gestion-Servicios-Wakanda-J-M-N/Python-Script-Launcher   -> Script para lanzar los microservicios en orden.
+6. https://github.com/Sistema-Gestion-Servicios-Wakanda-J-M-N/Backend_Wakanda_Salud
+7. https://github.com/Sistema-Gestion-Servicios-Wakanda-J-M-N/Backend-Wakanda-Agua
+8. https://github.com/Sistema-Gestion-Servicios-Wakanda-J-M-N/Backend-Wakanda-Transporte-Movilidad
+9. https://github.com/Sistema-Gestion-Servicios-Wakanda-J-M-N/Backend-Wakanda-Gobierno
+10. https://github.com/Sistema-Gestion-Servicios-Wakanda-J-M-N/Backend-Wakanda-Cultura-Ocio-Turismo
+11. https://github.com/Sistema-Gestion-Servicios-Wakanda-J-M-N/Backend-Wakanda-Trafico
+12. https://github.com/Sistema-Gestion-Servicios-Wakanda-J-M-N/Backend-Wakanda-Seguridad
+13. https://github.com/Sistema-Gestion-Servicios-Wakanda-J-M-N/Backend-Wakanda-Residuos
+14. https://github.com/Sistema-Gestion-Servicios-Wakanda-J-M-N/Backend-Wakanda-Conectividad-Redes
+15. https://github.com/Sistema-Gestion-Servicios-Wakanda-J-M-N/Backend-Wakanda-Energia-Sostenible-Eficiente
+16. https://github.com/Sistema-Gestion-Servicios-Wakanda-J-M-N/Backend-Wakanda-Servicios-Emergencia
+17. https://github.com/Sistema-Gestion-Servicios-Wakanda-J-M-N/Backend-Wakanda-Educacion
+
+## Participantes del proyecto
 
 - Jaime López Díaz
 - Marcos García Benito
 - Nicolas Jimenez
 - Juan Manuel
-
-# Backend Wakanda Salud
 
 Este proyecto es un microservicio de gestión de citas médicas y historial médico, diseñado para gestionar centros de salud, médicos, pacientes, citas y notificaciones. Ofrece funcionalidad a través de una API REST para interactuar con la API principal y de esta manera enviar datos sobre la lógica de negocio, y recibir el token de autentificación con los datos del usuario y sus roles.
 
